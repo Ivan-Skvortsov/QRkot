@@ -135,5 +135,6 @@ dmypy.json
 
 # database
 fastapi.db
+cat_charity_fund.db
 
 .vscode/
