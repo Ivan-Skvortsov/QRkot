@@ -19,5 +19,9 @@ class CRUDCharityProject(BaseCRUD):
         )
         return charity_project
 
+    async def get_projects_by_completion_rate():
+        # TODO Метод должен возвращать отсортированный список закрытых проектов
+        ...
+
 
 charity_project_crud = CRUDCharityProject(CharityProject)
