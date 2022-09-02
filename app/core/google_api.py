@@ -9,11 +9,10 @@ SCOPES = [
 ]
 
 INFO = {
-    'email': settings.email,
     'type': settings.type,
     'project_id': settings.project_id,
     'private_key_id': settings.private_key_id,
-    'aprivate_key': settings.aprivate_key,
+    'private_key': settings.aprivate_key.replace('\\n', '\n'),
     'client_email': settings.client_email,
     'client_id': settings.client_id,
     'auth_uri': settings.auth_uri,
@@ -22,9 +21,9 @@ INFO = {
     'client_x509_cert_url': settings.client_x509_cert_url,
 }
 
-creds = ServiceAccountCreds(scopes=SCOPES, **INFO)
+CREDS = ServiceAccountCreds(scopes=SCOPES, **INFO)
 
 
 async def get_service():
-    with Aiogoogle(service_account_creds=creds) as aiogoogle:
+    async with Aiogoogle(service_account_creds=CREDS) as aiogoogle:
         yield aiogoogle

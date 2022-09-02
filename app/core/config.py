@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     secret: str = 'Super secret key'
     first_superuser_email: Optional[EmailStr] = None
     first_superuser_password: Optional[str] = None
-    email: Optional[str] = None
+
+    # google api
     type: Optional[str] = None
     project_id: Optional[str] = None
     private_key_id: Optional[str] = None
@@ -22,6 +23,10 @@ class Settings(BaseSettings):
     token_uri: Optional[str] = None
     auth_provider_x509_cert_url: Optional[str] = None
     client_x509_cert_url: Optional[str] = None
+
+    # spreadsheet settings
+    spreadsheet_user_email: Optional[str] = None
+    spreadsheet_report_title: str = 'Отчет по закрытым проектам'
 
     class Config:
         env_file = '.env'
