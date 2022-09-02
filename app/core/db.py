@@ -27,7 +27,7 @@ class DonationMixin:
 
 
 Base = declarative_base(cls=PreBase)
-engine = create_async_engine(settings.database_url)
+engine = create_async_engine(settings.database_url, echo=True)
 async_session = sessionmaker(engine, class_=AsyncSession)
 
 

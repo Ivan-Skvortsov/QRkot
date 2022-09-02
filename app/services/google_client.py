@@ -28,7 +28,7 @@ async def spreadsheets_create(aiogoogle_object: Aiogoogle) -> str:
 async def set_user_permissions(
     spreadsheet_id: str,
     aiogoogle_object: Aiogoogle,
-    user_email: str = settings.spreadsheet_user_email
+    user_email: str = settings.email
 ) -> None:
     """
     Разрешает доступ к файлу с id = spreadsheet_id на гугл-диске
@@ -59,8 +59,8 @@ async def spreadsheets_update_value(
         api_name='sheets', api_version='v4'
     )
     table_values = [
+        ['Отчет от:', datetime.now().strftime(DATETIME_FORMAT)],
         ['Топ проектов по скорости закрытия'],
-        ['Дата и время формирования отчета', datetime.now().strftime(DATETIME_FORMAT)],
         ['Название проекта', 'Время сбора', 'Описание проекта']
     ]
     for i in range(25):
