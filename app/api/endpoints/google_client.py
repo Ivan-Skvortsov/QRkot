@@ -1,35 +1,44 @@
-from fastapi import APIRouter, Depends
+from http import HTTPStatus
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from aiogoogle import Aiogoogle
 
 from app.crud import charity_project_crud
 from app.core.google_client import get_service
-from app.services.google_client import (spreadsheets_create,
-                                     spreadsheets_update_value,
-                                     set_user_permissions)
+from app.services.google_client import generate_report
 from app.core.user import current_superuser
 from app.core.db import get_async_session
+from app.api.validators import check_google_api_variables_are_set
+from app.core.config import settings
+
 
 router = APIRouter()
 
 
 @router.post(
     '/',
-    # response_model=list[dict[str, str]],
-    response_model=str,
     dependencies=[Depends(current_superuser)]
 )
 async def get_spreadsheet_report(
     aiogoogle_object: Aiogoogle = Depends(get_service),
     session: AsyncSession = Depends(get_async_session)
 ):
-    # TODO Эндпойнт для формирования отчёта в гугл-таблице.
-    # В таблице должны быть закрытые проекты, отсортированные
-    # по скорости сбора средств — от тех, что закрылись быстрее всего,
-    # до тех, что долго собирали нужную сумму.
-    # TODO! добавить валидацию - проверять, есть ли в .env нужные данные
-    # spreadsheet_id = await spreadsheets_create(aiogoogle_object)
-    charity_projects = await charity_project_crud.get_projects_by_completion_rate(
+    """
+    Только для суперпользователей.
+    Формирует отчет по закрытым благотворительным проектам.
+    """
+    await check_google_api_variables_are_set(settings=settings)
+    projects = await charity_project_crud.get_projects_by_completion_rate(
         session=session
     )
-    return 'Hello!'
+    try:
+        report_link = await generate_report(
+            data=projects, aiogoogle_object=aiogoogle_object
+        )
+        return {'Report link': report_link}
+    except Exception as e:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=f'Формирование отчета завершилось с ошибкой: {e}'
+        )

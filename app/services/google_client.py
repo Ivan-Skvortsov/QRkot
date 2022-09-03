@@ -1,11 +1,56 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiogoogle import Aiogoogle
 
 from app.core.config import settings
+from app.models import CharityProject
 
 
-DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S"
+DATETIME_FORMAT = '%Y/%m/%d %H:%M:%S'
+
+SHEET_FORMAT = {
+    'requests': [
+        {
+            'autoResizeDimensions': {
+                'dimensions': {
+                    'sheetId': 0,
+                    'dimension': 'COLUMNS',
+                    'startIndex': 0,
+                    'endIndex': 3
+                }
+            }
+        },
+        {
+            'repeatCell': {
+                'range': {
+                    'sheetId': 0,
+                    'startRowIndex': 3,
+                    'endRowIndex': 3
+                },
+                'cell': {
+                    'userEnteredFormat': {
+                        'backgroundColor': {
+                            'red': 0.0,
+                            'green': 0.0,
+                            'blue': 0.0
+                            },
+                        'horizontalAlignment': 'CENTER',
+                        'textFormat': {
+                            'foregroundColor': {
+                                'red': 1.0,
+                                'green': 1.0,
+                                'blue': 1.0
+                            },
+                            'fontSize': 12,
+                            'bold': True
+                        }
+                    }
+                },
+                'fields': 'userEnteredFormat(backgroundColor, textFormat, horizontalAlignment)'  # noqa
+            }
+        }
+    ]
+}
 
 
 async def spreadsheets_create(aiogoogle_object: Aiogoogle) -> str:
@@ -14,8 +59,8 @@ async def spreadsheets_create(aiogoogle_object: Aiogoogle) -> str:
         api_name='sheets', api_version='v4'
     )
     spreadsheet_body = {
-        'properties': {"title": settings.spreadsheet_report_title,
-                       "locale": 'ru_RU'},
+        'properties': {'title': settings.spreadsheet_report_title,
+                       'locale': 'ru_RU'},
         'sheets': [{'properties': {'sheetId': 0,
                                    'title': 'Отчет'}}]
     }
@@ -52,7 +97,9 @@ async def set_user_permissions(
 
 
 async def spreadsheets_update_value(
-    spreadsheet_id: str, data: list, aiogoogle_object: Aiogoogle
+    spreadsheet_id: str,
+    data: list[CharityProject],
+    aiogoogle_object: Aiogoogle
 ) -> str:
     """Наполняет таблицу с id = spreadsheet_id данными data."""
     spreadsheet_service = await aiogoogle_object.discover(
@@ -63,16 +110,25 @@ async def spreadsheets_update_value(
         ['Топ проектов по скорости закрытия'],
         ['Название проекта', 'Время сбора', 'Описание проекта']
     ]
-    for i in range(25):
-        table_values.append([f'Название_{i}', i, f'Описание №{i}'])
+    for project in data:
+        project_completion_time = timedelta(
+            seconds=float(project.seconds_to_complete)
+        )
+        print(project.seconds_to_complete)
+        table_values.append([
+            str(project.name),
+            str(project_completion_time),
+            str(project.description)
+        ])
     table_body = {
         'values': table_values,
         'majorDimension': 'ROWS'
     }
+    row_count = len(table_body['values'])
     await aiogoogle_object.as_service_account(
         spreadsheet_service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
-            range='A1:E30',
+            range=f'A1:C{row_count}',
             valueInputOption='USER_ENTERED',
             json=table_body
         )
@@ -80,6 +136,11 @@ async def spreadsheets_update_value(
     return spreadsheet_id
 
 
-async def style_spreadsheets_report():
-    # TODO наводим красоту
-    ...
+async def generate_report(
+    data: list[CharityProject], aiogoogle_object: Aiogoogle
+) -> str:
+    """Формирует отчет и возвращает гиперссылку на него."""
+    spreadsheet_id = await spreadsheets_create(aiogoogle_object)
+    await spreadsheets_update_value(spreadsheet_id, data, aiogoogle_object)
+    await set_user_permissions(spreadsheet_id, aiogoogle_object)
+    return f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}'

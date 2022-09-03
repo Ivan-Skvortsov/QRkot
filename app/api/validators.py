@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud import charity_project_crud
 from app.models import CharityProject
 from app.schemas import CharityProjectUpdateSchema
+from app.core.config import Settings
 
 
 async def check_charity_project_exists(
@@ -65,7 +66,7 @@ async def check_charity_project_before_update(
     session: AsyncSession,
 ) -> CharityProject:
     """
-    Проверяте возможность редактирования проекта:
+    Проверят возможность редактирования проекта:
         - проект должен существовать в базе;
         - новое имя не должно дублировать существюущие в базе;
         - проект не должен быть закрыт;
@@ -91,3 +92,24 @@ async def check_charity_project_before_update(
         charity_project_name=name_update_value, session=session
     )
     return charity_project
+
+
+async def check_google_api_variables_are_set(settings: Settings):
+    """Проверяет, что настроечные параметры Google API установлены."""
+    if not all([settings.type,
+                settings.project_id,
+                settings.private_key_id,
+                settings.private_key,
+                settings.client_email,
+                settings.client_id,
+                settings.auth_uri,
+                settings.token_uri,
+                settings.auth_provider_x509_cert_url,
+                settings.client_x509_cert_url,
+                settings.email]):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_ACCEPTABLE,
+            detail=('Невозможно сформировать отчет. '
+                    'Ошибка в конфигурационных параметрах. '
+                    'Проверьте настройки Google API.')
+        )

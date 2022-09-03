@@ -25,7 +25,6 @@ class Settings(BaseSettings):
     client_x509_cert_url: Optional[str] = None
     email: Optional[str] = None
 
-    # spreadsheet settings
     spreadsheet_report_title: str = 'Отчет по закрытым проектам'
 
     class Config:
