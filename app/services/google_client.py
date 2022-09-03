@@ -70,7 +70,6 @@ async def spreadsheets_update_value(
         project_completion_time = timedelta(
             seconds=float(project.seconds_to_complete)
         )
-        print(project.seconds_to_complete)
         table_values.append([
             str(project.name),
             str(project_completion_time),
