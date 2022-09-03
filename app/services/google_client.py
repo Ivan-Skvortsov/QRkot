@@ -8,50 +8,6 @@ from app.models import CharityProject
 
 DATETIME_FORMAT = '%Y/%m/%d %H:%M:%S'
 
-SHEET_FORMAT = {
-    'requests': [
-        {
-            'autoResizeDimensions': {
-                'dimensions': {
-                    'sheetId': 0,
-                    'dimension': 'COLUMNS',
-                    'startIndex': 0,
-                    'endIndex': 3
-                }
-            }
-        },
-        {
-            'repeatCell': {
-                'range': {
-                    'sheetId': 0,
-                    'startRowIndex': 3,
-                    'endRowIndex': 3
-                },
-                'cell': {
-                    'userEnteredFormat': {
-                        'backgroundColor': {
-                            'red': 0.0,
-                            'green': 0.0,
-                            'blue': 0.0
-                            },
-                        'horizontalAlignment': 'CENTER',
-                        'textFormat': {
-                            'foregroundColor': {
-                                'red': 1.0,
-                                'green': 1.0,
-                                'blue': 1.0
-                            },
-                            'fontSize': 12,
-                            'bold': True
-                        }
-                    }
-                },
-                'fields': 'userEnteredFormat(backgroundColor, textFormat, horizontalAlignment)'  # noqa
-            }
-        }
-    ]
-}
-
 
 async def spreadsheets_create(aiogoogle_object: Aiogoogle) -> str:
     """Создаёт шаблон гугл-таблицы на гугл-диске севисного аккаунта."""
