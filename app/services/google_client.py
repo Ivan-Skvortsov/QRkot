@@ -12,12 +12,13 @@ DATETIME_FORMAT = '%Y/%m/%d %H:%M:%S'
 async def spreadsheets_create(aiogoogle_object: Aiogoogle) -> str:
     """Создаёт шаблон гугл-таблицы на гугл-диске севисного аккаунта."""
     spreadsheet_service = await aiogoogle_object.discover(
-        api_name='sheets', api_version='v4'
+        api_name=settings.spreadsheet_api_name,
+        api_version=settings.spreadsheet_api_version
     )
     spreadsheet_body = {
         'properties': {'title': settings.spreadsheet_report_title,
                        'locale': 'ru_RU'},
-        'sheets': [{'properties': {'sheetId': 0,
+        'sheets': [{'properties': {'sheetId': settings.spreadsheet_sheet_id,
                                    'title': 'Отчет'}}]
     }
     response = await aiogoogle_object.as_service_account(
@@ -36,7 +37,8 @@ async def set_user_permissions(
     сервисного аккаунта пользователю user_email.
     """
     drive_service = await aiogoogle_object.discover(
-        api_name='drive', api_version='v3'
+        api_name=settings.google_drive_api_name,
+        api_version=settings.google_drive_api_version
     )
     permissions_body = {
         'role': 'writer',
@@ -59,7 +61,8 @@ async def spreadsheets_update_value(
 ) -> str:
     """Наполняет таблицу с id = spreadsheet_id данными data."""
     spreadsheet_service = await aiogoogle_object.discover(
-        api_name='sheets', api_version='v4'
+        api_name=settings.spreadsheet_api_name,
+        api_version=settings.spreadsheet_api_version
     )
     table_values = [
         ['Отчет от:', datetime.now().strftime(DATETIME_FORMAT)],

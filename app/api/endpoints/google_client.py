@@ -18,7 +18,8 @@ router = APIRouter()
 
 @router.post(
     '/',
-    dependencies=[Depends(current_superuser)]
+    dependencies=[Depends(current_superuser)],
+    summary='Отчет по закрытым проектам'
 )
 async def get_spreadsheet_report(
     aiogoogle_object: Aiogoogle = Depends(get_service),

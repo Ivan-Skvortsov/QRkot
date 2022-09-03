@@ -86,10 +86,21 @@
    TOKEN_URI=https://oauth2.googleapis.com/token
    AUTH_PROVIDER_X509_CERT_URL=https://www.googleapis.com/oauth2/v1/certs
    CLIENT_X509_CERT_URL=https://www.googleapis.com/robot/v1/metadata/x509/some-url
-   # почта пользователя, имеюзего доступ к отчет
+   # почта пользователя, имеющего доступ к отчет
    EMAIL=your@mail.com
    # заголовок отчета
    SPREADSHEET_REPORT_TITLE=Отчет по закрытым проектам QRkot
+   # ID листа
+   SPREADSHEET_SHEET_ID=0
+   # версия API для сервиса Spreadsheets
+   SPREADSHEET_API_VERSION=v4
+   # имя API для сервиса Spreadsheets
+   SPREADSHEET_API_NAME=sheets
+   # версия API для сервиса Google Drive
+   GOOGLE_DRIVE_API_VERSION=v3
+   # имя API для сервиса Google Drive
+   GOOGLE_DRIVE_API_NAME=drive
+
    ```
 <p align="right">(<a href="#top">наверх</a>)</p>
 

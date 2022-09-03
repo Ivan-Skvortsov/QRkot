@@ -25,7 +25,13 @@ class Settings(BaseSettings):
     client_x509_cert_url: Optional[str] = None
     email: Optional[str] = None
 
+    # spreadsheet and drive settings
     spreadsheet_report_title: str = 'Отчет по закрытым проектам'
+    spreadsheet_sheet_id: int = 0
+    spreadsheet_api_version: str = 'v4'
+    spreadsheet_api_name: str = 'sheets'
+    google_drive_api_version: str = 'v3'
+    google_drive_api_name: str = 'drive'
 
     class Config:
         env_file = '.env'
